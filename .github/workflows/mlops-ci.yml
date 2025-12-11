@@ -1,6 +1,6 @@
 name: MLOps Security Pipeline
 
-# Se ejecuta cada vez que haces push a la rama principal
+# Se ejecuta en cada push a la rama principal
 on:
   push:
     branches: [ "main" ]
@@ -12,39 +12,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Descargar tu código del repositorio
+    # 1. Descargar código
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    # 2. Instalar Python
+    # 2. Instalar Python + CACHÉ (Optimización 1)
+    # Esto guarda las librerías en caché para que la próxima vez no las descargue de nuevo
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
+        cache: 'pip' 
 
-    # 3. Instalar librerías
+    # 3. Instalar librerías (Optimización 2 - CRÍTICA)
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
+        
+        # TRUCO MLOps: Instalar explícitamente la versión CPU de PyTorch (~150MB)
+        # Esto evita descargar los 2.5GB de drivers NVIDIA CUDA que no sirven en GitHub Actions
+        pip install torch --index-url https://download.pytorch.org/whl/cpu
+        
+        # Ahora instalamos el resto. Pip detectará que torch ya está y no lo bajará de nuevo.
         pip install -r requirements.txt
+        
+        # Librerías extra para el script de prueba
         pip install pytest requests
 
-    # 4. Levantar la API en segundo plano (Background)
-    # Esto simula el servidor de producción dentro de GitHub
+    # 4. Levantar la API en segundo plano
     - name: Start Flask API
       env:
-        HF_TOKEN: ${{ secrets.HF_TOKEN }} # Lee el token si el repo es privado
+        HF_TOKEN: ${{ secrets.HF_TOKEN }} 
       run: |
-        # Ejecutar en background (&) y guardar logs
+        # Usamos nohup para que siga corriendo mientras pasamos al siguiente paso
         nohup python app.py > server.log 2>&1 &
-        echo "Servidor iniciado en segundo plano..."
+        echo "Servidor iniciándose..."
 
-    # 5. Ejecutar la batería de pruebas
-    # El script test_api.py se encargará de esperar a que cargue el modelo
+    # 5. Ejecutar pruebas de integración
+    # Tu script test_api.py ya tiene la lógica de espera (wait_for_server)
     - name: Run Integration Tests
       run: python test_api.py
 
-    # 6. (Opcional) Mostrar logs del servidor si algo falló
+    # 6. Diagnóstico: Mostrar logs si falla
     - name: Show Server Logs (on failure)
       if: failure()
       run: cat server.log
