@@ -9,8 +9,10 @@ API_URL = "https://clasificadorml-production.up.railway.app/predict"
 # Datos de prueba
 TEST_CASES = [
     {"texto": "Me robaron el auto a punta de pistola en la entrada de mi casa."},
-    {"texto": "Hay un grupo de personas consumiendo drogas en el parque."},
-    {"texto": "Me empujaron y golpearon para quitarme mis pertenencias."}
+    {"texto": "me quitaron la mochila luego de botarme al suelo y pegarme con palos."},
+    {"texto": "me golpearon y empujaron para robarme la mochila."},
+    {"texto": "mi vecino vende sustancias ilicitas en su casa"}
+    
 ]
 
 def run_tests():

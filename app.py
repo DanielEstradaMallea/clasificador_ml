@@ -22,7 +22,7 @@ CORS(app)
 
 # --- CONFIGURACIÓN DEL MODELO ---
 # Tu repositorio en Hugging Face
-MODEL_ID = "RuloDan/clasificador-seguridad-xyz"
+MODEL_ID = "RuloDan/clasificador-seguridad-xyz2"
 
 # Token de seguridad (necesario si tu repo es PRIVADO)
 hf_token = os.environ.get("HF_TOKEN")
