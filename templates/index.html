@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificador de Denuncias | Portal Institucional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette Dark Modern */
+            --primary-brand: #0d47a1;
+            /* Deep Blue for Header */
+            --primary-accent: #64b5f6;
+            /* Lighter Blue for highlights */
+            --secondary-color: #1976d2;
+            /* Button default */
+            --secondary-hover: #1565c0;
+            /* Button hover */
+
+            --background-color: #0f172a;
+            /* Slate 900 */
+            --card-bg: #1e293b;
+            /* Slate 800 */
+
+            --text-color: #f1f5f9;
+            /* Slate 100 */
+            --text-muted: #94a3b8;
+            /* Slate 400 */
+
+            --border-color: #334155;
+            /* Slate 700 */
+            --input-bg: #0f172a;
+
+            --result-bg: #172554;
+            /* Blue 950 */
+            --result-border: #3b82f6;
+            /* Blue 500 */
+
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #64b5f6, #2196f3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-width: 700px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: var(--primary-accent);
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        /* Form Elements */
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.2s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            background-image: linear-gradient(to right, #1976d2, #1565c0);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: transform 0.1s, box-shadow 0.2s;
+            display: block;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-image: linear-gradient(to right, #1565c0, #0d47a1);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Results */
+        .resultado {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: var(--result-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--result-border);
+            display: none;
+            /* Hidden by default */
+        }
+
+        .resultado h3 {
+            margin-top: 0;
+            color: var(--primary-accent);
+            font-size: 1.25rem;
+        }
+
+        .res-item {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .res-item:last-child {
+            border-bottom: none;
+        }
+
+        .confidence-bar-bg {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 99px;
+            height: 6px;
+            width: 100%;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .confidence-bar-fill {
+            background-color: var(--primary-accent);
+            height: 100%;
+            border-radius: 99px;
+            box-shadow: 0 0 8px rgba(100, 181, 246, 0.5);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+            background-color: var(--card-bg);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-text">Sistema de Denuncias</div>
+            <div style="font-size: 0.9rem; opacity: 0.8;">Panel Seguro</div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1>Clasificador de Delitos</h1>
+            <p>Ingrese la descripción detallada de los hechos. El sistema analizará el texto para sugerir la
+                clasificación del delito correspondiente.</p>
+
+            <label for="inputTexto">Descripción de los hechos:</label>
+            <textarea id="inputTexto" rows="6" placeholder="Describa lo sucedido aquí..."></textarea>
+
+            <button onclick="enviarTexto()">Analizar Denuncia</button>
+
+            <div class="resultado" id="resultado"></div>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2025 Sistema XYZ - Sistema de Inteligencia Artificial para la Gestión de Denuncias
+    </footer>
+
+    <script>
+        async function enviarTexto() {
+            const texto = document.getElementById('inputTexto').value;
+            const resultadoDiv = document.getElementById('resultado');
+
+            if (!texto.trim()) {
+                alert("Por favor ingrese una descripción.");
+                return;
+            }
+
+            resultadoDiv.style.display = 'block';
+            resultadoDiv.innerHTML = '<p style="text-align:center; color: var(--text-muted);">Procesando denuncia con IA...</p>';
+
+            try {
+                // TU URL DE RAILWAY
+                // Al usar solo '/predict', el navegador asume que es el mismo dominio actual
+                const respuesta = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ texto })
+                });
+
+                if (!respuesta.ok) {
+                    throw new Error(`Error del servidor: ${respuesta.status}`);
+                }
+
+                const datos = await respuesta.json();
+
+                // Formatear porcentaje (ej: 0.985 -> 98.5)
+                const formatPct = (val) => (val * 100).toFixed(1);
+
+                // Renderizar resultado adaptado a la respuesta real de tu API
+                resultadoDiv.innerHTML = `
+          <h3>Clasificación Detectada</h3>
+          
+          <div class="res-item">
+             <div>
+                <strong>Modelo DistilBERT (Producción)</strong><br>
+                <span style="color: var(--text-color); font-size: 1.1em; font-weight: bold;">${datos.clase}</span>
+             </div>
+             <div style="text-align:right; font-weight:bold; color: var(--primary-accent); font-size: 1.2em;">
+                ${formatPct(datos.probabilidad)}%
+             </div>
+          </div>
+          <div class="confidence-bar-bg">
+                <div class="confidence-bar-fill" style="width: ${formatPct(datos.probabilidad)}%"></div>
+          </div>
+          
+          <p style="margin-top: 15px; font-size: 0.8rem; text-align: center;">
+            Clasificación realizada en servidor seguro.
+          </p>
+        `;
+            } catch (error) {
+                console.error(error);
+                resultadoDiv.innerHTML = `<p style="color: #ef5350;"><strong>Error de Conexión:</strong> ${error.message}. <br>Asegúrese de que el servidor Railway esté activo.</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
