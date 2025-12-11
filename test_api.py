@@ -3,8 +3,8 @@ import time
 import sys
 
 # URL local para el entorno de pruebas de GitHub Actions
-API_URL = "http://127.0.0.1:5000/predict"
-HEALTH_URL = "http://127.0.0.1:5000/health"
+API_URL = "https://clasificadorml-production.up.railway.app/predict"
+HEALTH_URL = "https://clasificadorml-production.up.railway.app/health"
 
 # Casos de prueba críticos
 TEST_CASES = [
