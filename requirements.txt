@@ -4,3 +4,4 @@ transformers
 gunicorn
 safetensors
 accelerate
+flask-cors

@@ -4,7 +4,7 @@ import sys
 
 # --- CONFIGURACIÓN ---
 # Cambia esto cuando tengas tu URL de Railway (ej: https://mi-app.up.railway.app/predict)
-API_URL = "http://localhost:5000/predict" 
+API_URL = "https://clasificadorml-production.up.railway.app/predict" 
 
 # Datos de prueba
 TEST_CASES = [

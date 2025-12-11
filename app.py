@@ -8,6 +8,8 @@ import torch.quantization # Importante para la optimización
 import torch.nn.functional as F
 from flask import Flask, request, jsonify
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from flask_cors import CORS
+
 
 # --- CONFIGURACIÓN DE LOGS (Observabilidad) ---
 logger = logging.getLogger()
@@ -16,13 +18,13 @@ handler = logging.StreamHandler(sys.stdout)
 logger.addHandler(handler)
 
 app = Flask(__name__)
+CORS(app)
 
 # --- CONFIGURACIÓN DEL MODELO ---
 # Tu repositorio en Hugging Face
 MODEL_ID = "RuloDan/clasificador-seguridad-xyz"
 
 # Token de seguridad (necesario si tu repo es PRIVADO)
-# Si es público, esta variable puede estar vacía y funcionará igual.
 hf_token = os.environ.get("HF_TOKEN")
 
 device = torch.device("cpu") # Railway usa CPU por defecto
