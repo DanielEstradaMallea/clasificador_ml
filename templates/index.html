@@ -4,261 +4,615 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clasificador de Denuncias | Portal Institucional</title>
+    <title>Dashboard | Clasificador de Denuncias</title>
+    <!-- Fonts: Roboto & Material Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
     <style>
         :root {
-            /* Palette Dark Modern */
-            --primary-brand: #0d47a1;
-            /* Deep Blue for Header */
-            --primary-accent: #64b5f6;
-            /* Lighter Blue for highlights */
-            --secondary-color: #1976d2;
-            /* Button default */
-            --secondary-hover: #1565c0;
-            /* Button hover */
+            /* Palette Dark Institutional */
+            --bg-body: #0f172a;
+            /* Darkest Slate */
+            --bg-sidebar: #1e293b;
+            /* Sidebar/Card bg */
+            --bg-card: #1e293b;
+            --bg-input: #0f172a;
 
-            --background-color: #0f172a;
-            /* Slate 900 */
-            --card-bg: #1e293b;
-            /* Slate 800 */
+            --primary: #3b82f6;
+            /* Blue 500 */
+            --primary-dark: #2563eb;
+            /* Blue 600 */
+            --accent: #64b5f6;
+            /* Light Blue */
 
-            --text-color: #f1f5f9;
-            /* Slate 100 */
+            --text-main: #f8fafc;
+            /* Slate 50 */
             --text-muted: #94a3b8;
             /* Slate 400 */
-
             --border-color: #334155;
             /* Slate 700 */
-            --input-bg: #0f172a;
 
-            --result-bg: #172554;
-            /* Blue 950 */
-            --result-border: #3b82f6;
-            /* Blue 500 */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
 
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+            --nav-width: 260px;
+            --header-height: 64px;
         }
 
         * {
             box-sizing: border-box;
+            outline: none;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: var(--nav-width);
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            position: fixed;
+            height: 100%;
+            z-index: 20;
+            transition: transform 0.3s;
         }
 
-        /* Header */
-        header {
-            background-color: var(--card-bg);
+        .brand {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
             border-bottom: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 1rem 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
         }
 
-        .header-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .brand span {
+            color: var(--primary);
+            margin-right: 6px;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            /* Primary low opacity */
+            color: var(--accent);
+        }
+
+        .nav-item .material-icons-round {
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        .user-profile {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .user-info .name {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .user-info .role {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* --- Main Wrapper --- */
+        .wrapper {
+            margin-left: var(--nav-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - var(--nav-width));
+            height: 100vh;
+        }
+
+        /* --- Top Bar --- */
+        .top-bar {
+            height: var(--header-height);
+            background-color: var(--bg-sidebar);
+            /* Institutional look usually matches sidebar or is light */
+            background-color: rgba(30, 41, 59, 0.8);
+            /* Glassy */
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            background: linear-gradient(90deg, #64b5f6, #2196f3);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .breadcrumbs {
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
-        /* Main Content */
-        main {
-            flex: 1;
-            padding: 40px 20px;
+        .breadcrumbs span {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .top-actions {
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            gap: 1.5rem;
+            align-items: center;
         }
 
-        .container {
-            background-color: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            max-width: 700px;
-            width: 100%;
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .icon-btn:hover {
+            color: var(--text-main);
+        }
+
+        .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-sidebar);
+        }
+
+        /* --- Content Area --- */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background-color: var(--bg-body);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
             border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
-        h1 {
-            margin-top: 0;
-            color: var(--primary-accent);
+        .stat-title {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
             font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .stat-trend {
+            font-size: 0.85rem;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-trend.down {
+            color: var(--danger);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            /* Main form takes more space */
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
         }
 
-        p {
-            color: var(--text-muted);
-            margin-bottom: 1rem;
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0;
         }
 
-        /* Form Elements */
+        /* Form */
         label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
-            color: var(--text-color);
+            color: var(--text-muted);
         }
 
         textarea {
             width: 100%;
             padding: 1rem;
             background-color: var(--input-bg);
-            color: var(--text-color);
+            color: var(--text-main);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             font-family: inherit;
             font-size: 1rem;
             resize: vertical;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
+            margin-bottom: 1.5rem;
         }
 
         textarea:focus {
-            outline: none;
-            border-color: var(--primary-accent);
-            box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
-        button {
-            background-color: var(--secondary-color);
-            background-image: linear-gradient(to right, #1976d2, #1565c0);
+        .btn-primary {
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 0.8rem 2rem;
-            font-size: 1rem;
-            font-weight: 500;
-            border-radius: 8px;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
             cursor: pointer;
-            margin-top: 1.5rem;
-            transition: transform 0.1s, box-shadow 0.2s;
-            display: block;
-            width: 100%;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        button:hover {
-            background-image: linear-gradient(to right, #1565c0, #0d47a1);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
-            transform: translateY(-1px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        /* Results */
-        .resultado {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background-color: var(--result-bg);
-            border-radius: 8px;
-            border-left: 4px solid var(--result-border);
-            display: none;
-            /* Hidden by default */
-        }
-
-        .resultado h3 {
-            margin-top: 0;
-            color: var(--primary-accent);
-            font-size: 1.25rem;
-        }
-
-        .res-item {
-            padding: 0.8rem 0;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
+            transition: background 0.2s;
+            display: inline-flex;
             align-items: center;
+            gap: 8px;
         }
 
-        .res-item:last-child {
-            border-bottom: none;
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Results Area */
+        .resultado {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background-color: rgba(59, 130, 246, 0.05);
+            /* Very subtle tint */
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .resultado.active {
+            display: block;
         }
 
         .confidence-bar-bg {
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 99px;
-            height: 6px;
+            height: 8px;
             width: 100%;
-            margin-top: 8px;
+            margin-top: 10px;
             overflow: hidden;
         }
 
         .confidence-bar-fill {
-            background-color: var(--primary-accent);
+            background-color: var(--primary);
             height: 100%;
             border-radius: 99px;
-            box-shadow: 0 0 8px rgba(100, 181, 246, 0.5);
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-muted);
+        /* Table (Mockup) */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 0.9rem;
-            border-top: 1px solid var(--border-color);
-            margin-top: auto;
-            background-color: var(--card-bg);
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-high {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        .status-med {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+        }
+
+        .status-low {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #86efac;
         }
     </style>
 </head>
 
 <body>
 
-    <header>
-        <div class="header-container">
-            <div class="logo-text">Sistema de Denuncias</div>
-            <div style="font-size: 0.9rem; opacity: 0.8;">Panel Seguro</div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <span class="material-icons-round">security</span>
+            SecurePanel
         </div>
-    </header>
-
-    <main>
-        <div class="container">
-            <h1>Clasificador de Delitos</h1>
-            <p>Ingrese la descripción detallada de los hechos. El sistema analizará el texto para sugerir la
-                clasificación del delito correspondiente.</p>
-
-            <label for="inputTexto">Descripción de los hechos:</label>
-            <textarea id="inputTexto" rows="6" placeholder="Describa lo sucedido aquí..."></textarea>
-
-            <button onclick="enviarTexto()">Analizar Denuncia</button>
-
-            <div class="resultado" id="resultado"></div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active">
+                <span class="material-icons-round">dashboard</span>
+                Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons-round">assignment</span>
+                Denuncias
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons-round">analytics</span>
+                Estadísticas
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons-round">folder_shared</span>
+                Expedientes
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons-round">settings</span>
+                Configuración
+            </a>
+        </nav>
+        <div class="user-profile">
+            <div class="avatar">AG</div>
+            <div class="user-info">
+                <span class="name">Admin General</span>
+                <span class="role">Seguridad Institucional</span>
+            </div>
         </div>
-    </main>
+    </aside>
 
-    <footer>
-        &copy; 2025 Sistema XYZ - Sistema de Inteligencia Artificial para la Gestión de Denuncias
-    </footer>
+    <!-- Main Content -->
+    <div class="wrapper">
+        <header class="top-bar">
+            <div class="breadcrumbs">
+                Inicio / <span>Clasificador de Delitos</span>
+            </div>
+            <div class="top-actions">
+                <button class="icon-btn">
+                    <span class="material-icons-round">search</span>
+                </button>
+                <button class="icon-btn">
+                    <span class="material-icons-round">notifications</span>
+                    <span class="badge"></span>
+                </button>
+                <button class="icon-btn">
+                    <span class="material-icons-round">help_outline</span>
+                </button>
+            </div>
+        </header>
 
+        <main class="content">
+
+            <!-- Stats Row (Mockup) -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-title">Denuncias Hoy</span>
+                    <span class="stat-value">142</span>
+                    <span class="stat-trend"><span class="material-icons-round"
+                            style="font-size:16px">trending_up</span> +12% vs ayer</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-title">Precisión Modelo</span>
+                    <span class="stat-value">98.5%</span>
+                    <span class="stat-trend"><span class="material-icons-round"
+                            style="font-size:16px">check_circle</span> Estable</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-title">Casos Críticos</span>
+                    <span class="stat-value">8</span>
+                    <span class="stat-trend down"><span class="material-icons-round"
+                            style="font-size:16px">warning</span> Acción req.</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-title">Tiempo Promedio</span>
+                    <span class="stat-value">1.2s</span>
+                    <span class="stat-trend"><span class="material-icons-round" style="font-size:16px">flash_on</span>
+                        Óptimo</span>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+
+                <!-- Main Classification Tool -->
+                <div class="card clasificador-section">
+                    <div class="card-header">
+                        <h2 class="card-title">Nueva Clasificación</h2>
+                        <span class="material-icons-round" style="color:var(--text-muted)">smart_toy</span>
+                    </div>
+
+                    <p style="color:var(--text-muted); margin-bottom:1.5rem; font-size: 0.95rem;">
+                        Ingrese la narrativa de los hechos. El sistema utilizará el modelo de IA en producción para
+                        categorizar el incidente automáticamente.
+                    </p>
+
+                    <label for="inputTexto">Narrativa del Incidente</label>
+                    <textarea id="inputTexto" rows="6"
+                        placeholder="Ej: Se visualiza sustracción de billetera en vía pública..."></textarea>
+
+                    <div style="display:flex; justify-content:flex-end;">
+                        <button class="btn-primary" onclick="enviarTexto()">
+                            <span class="material-icons-round">bolt</span>
+                            Procesar Análisis
+                        </button>
+                    </div>
+
+                    <div class="resultado" id="resultado"></div>
+                </div>
+
+                <!-- Recent Activity Feed (Mockup) -->
+                <div class="card recent-activity">
+                    <div class="card-header">
+                        <h2 class="card-title">Actividad Reciente</h2>
+                        <span class="material-icons-round" style="color:var(--text-muted)">history</span>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Confianza</th>
+                                    <th>Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Hurto Agravado</td>
+                                    <td><span class="status-badge status-high">99%</span></td>
+                                    <td style="color:var(--text-muted)">10:42 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Robo Simple</td>
+                                    <td><span class="status-badge status-med">88%</span></td>
+                                    <td style="color:var(--text-muted)">10:38 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Vandalismo</td>
+                                    <td><span class="status-badge status-low">76%</span></td>
+                                    <td style="color:var(--text-muted)">10:15 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Hurto Simple</td>
+                                    <td><span class="status-badge status-high">95%</span></td>
+                                    <td style="color:var(--text-muted)">09:55 PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Agresión</td>
+                                    <td><span class="status-badge status-high">92%</span></td>
+                                    <td style="color:var(--text-muted)">09:30 PM</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top:1rem; text-align:center;">
+                        <a href="#" style="font-size:0.85rem; color:var(--primary); text-decoration:none;">Ver historial
+                            completo</a>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script Logic -->
     <script>
         async function enviarTexto() {
             const texto = document.getElementById('inputTexto').value;
@@ -270,11 +624,10 @@
             }
 
             resultadoDiv.style.display = 'block';
-            resultadoDiv.innerHTML = '<p style="text-align:center; color: var(--text-muted);">Procesando denuncia con IA...</p>';
+            resultadoDiv.innerHTML = '<div style="display:flex; align-items:center; gap:10px; color:var(--text-muted);"><span class="material-icons-round" style="animation:spin 1s linear infinite">sync</span> Analizando datos en tiempo real...</div>';
 
             try {
                 // TU URL DE RAILWAY
-                // Al usar solo '/predict', el navegador asume que es el mismo dominio actual
                 const respuesta = await fetch('/predict', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -286,37 +639,50 @@
                 }
 
                 const datos = await respuesta.json();
+                const porcentaje = (datos.probabilidad * 100).toFixed(1);
 
-                // Formatear porcentaje (ej: 0.985 -> 98.5)
-                const formatPct = (val) => (val * 100).toFixed(1);
-
-                // Renderizar resultado adaptado a la respuesta real de tu API
                 resultadoDiv.innerHTML = `
-          <h3>Clasificación Detectada</h3>
-          
-          <div class="res-item">
-             <div>
-                <strong>Modelo DistilBERT (Producción)</strong><br>
-                <span style="color: var(--text-color); font-size: 1.1em; font-weight: bold;">${datos.clase}</span>
-             </div>
-             <div style="text-align:right; font-weight:bold; color: var(--primary-accent); font-size: 1.2em;">
-                ${formatPct(datos.probabilidad)}%
-             </div>
-          </div>
-          <div class="confidence-bar-bg">
-                <div class="confidence-bar-fill" style="width: ${formatPct(datos.probabilidad)}%"></div>
-          </div>
-          
-          <p style="margin-top: 15px; font-size: 0.8rem; text-align: center;">
-            Clasificación realizada en servidor seguro.
-          </p>
-        `;
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                        <div>
+                            <span style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:bold;">Clasificación Detectada</span>
+                            <div style="font-size:1.4rem; font-weight:700; color:var(--text-main); margin-top:4px;">${datos.clase}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <span style="font-size:1.5rem; font-weight:700; color:var(--primary);">${porcentaje}%</span>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">Confianza</div>
+                        </div>
+                    </div>
+                    
+                    <div class="confidence-bar-bg">
+                        <div class="confidence-bar-fill" style="width: ${porcentaje}%"></div>
+                    </div>
+                    
+                    <div style="margin-top:15px; font-size:0.8rem; color:var(--success); display:flex; align-items:center; gap:5px;">
+                        <span class="material-icons-round" style="font-size:16px;">verified_user</span> 
+                        Análisis verificado por DistilBERT v2
+                    </div>
+                `;
             } catch (error) {
                 console.error(error);
-                resultadoDiv.innerHTML = `<p style="color: #ef5350;"><strong>Error de Conexión:</strong> ${error.message}. <br>Asegúrese de que el servidor Railway esté activo.</p>`;
+                resultadoDiv.innerHTML = `
+                    <div style="color: var(--danger); display:flex; align-items:center; gap:8px;">
+                        <span class="material-icons-round">error_outline</span>
+                        <div>
+                            <strong>Error de Conexión</strong><br>
+                            <span style="font-size:0.9rem">${error.message}</span>
+                        </div>
+                    </div>`;
             }
         }
     </script>
+
+    <style>
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </body>
 
 </html>

@@ -21,7 +21,7 @@ app = Flask(__name__)
 CORS(app) # Ya no es estrictamente necesario si usas el mismo dominio, pero es bueno dejarlo.
 
 # --- CONFIGURACIÓN DEL MODELO ---
-MODEL_ID = "RuloDan/clasificador-seguridad-xyz"
+MODEL_ID = "RuloDan/clasificador-seguridad-xyz2"
 hf_token = os.environ.get("HF_TOKEN")
 device = torch.device("cpu")
 
