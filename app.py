@@ -17,48 +17,41 @@ logger.addHandler(handler)
 
 app = Flask(__name__)
 
-# --- CARGA DEL MODELO ---
-MODEL_PATH = "./models" 
+# --- CONFIGURACIÓN DEL MODELO ---
+# Tu repositorio en Hugging Face
+MODEL_ID = "RuloDan/clasificador-seguridad-xyz"
+
+# Token de seguridad (necesario si tu repo es PRIVADO)
+# Si es público, esta variable puede estar vacía y funcionará igual.
+hf_token = os.environ.get("HF_TOKEN")
+
 device = torch.device("cpu") # Railway usa CPU por defecto
 
-logger.info(json.dumps({"event": "startup", "message": f"Cargando modelo desde {MODEL_PATH}..."}))
-
-# --- VALIDACIÓN DE ARCHIVO LFS ---
-archivo_modelo = os.path.join(MODEL_PATH, "model.safetensors")
-if os.path.exists(archivo_modelo):
-    peso = os.path.getsize(archivo_modelo)
-    logger.info(json.dumps({"event": "file_check", "file": "model.safetensors", "size_bytes": peso}))
-    
-    if peso < 10000: # Si pesa menos de 10KB, es un puntero LFS roto
-        msg = f"ERROR CRÍTICO: El archivo del modelo pesa solo {peso} bytes. Es un puntero LFS, no el binario real."
-        logger.error(json.dumps({"event": "lfs_error", "message": msg}))
-        # No hacemos raise inmediato para permitir ver el log, pero fallará abajo.
-else:
-    logger.error(json.dumps({"event": "file_check", "error": "Archivo no encontrado"}))
-# ---------------------------------
+logger.info(json.dumps({"event": "startup", "message": f"Iniciando descarga de {MODEL_ID}..."}))
 
 try:
-    # 1. Cargar Tokenizer y Modelo
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
+    # 1. Cargar Tokenizer y Modelo desde la Nube (Hugging Face Hub)
+    # Transformers gestiona la descarga y el caché automáticamente.
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, token=hf_token)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID, token=hf_token)
     
     # 2. BLOQUE DE OPTIMIZACIÓN (QUANTIZATION)
-    # Esto reduce drásticamente el peso de las operaciones matemáticas (de 32-bit a 8-bit)
-    # Ideal para CPUs sin tarjeta de video.
+    # Reduce el peso matemático de 32-bit a 8-bit para velocidad en CPU
     print("⚡ Optimizando modelo para CPU (Quantization)...")
     model = torch.quantization.quantize_dynamic(
         model, 
-        {torch.nn.Linear},  # Aplicar solo a las capas lineales (las más pesadas)
+        {torch.nn.Linear},  # Optimizar capas lineales
         dtype=torch.qint8
     )
     
     model.to(device)
-    model.eval() # Modo evaluación (desactiva randomness)
+    model.eval() # Modo evaluación
     
-    logger.info(json.dumps({"event": "startup", "status": "success", "message": "Modelo cargado y CUANTIZADO (Optimizado)"}))
+    logger.info(json.dumps({"event": "startup", "status": "success", "message": "Modelo descargado de HF y optimizado"}))
 
 except Exception as e:
     logger.error(json.dumps({"event": "startup_error", "error": str(e)}))
+    # Es crítico que falle aquí si no puede descargar el modelo
     raise e
 
 # --- ENDPOINTS ---
@@ -81,13 +74,12 @@ def predict():
     
     try:
         # 2. Preprocesamiento Optimizado
-        # max_length=128 es suficiente para denuncias cortas y ahorra mucha CPU
         inputs = tokenizer(
             texto_entrada, 
             return_tensors="pt", 
             truncation=True, 
             padding=True, 
-            max_length=128 
+            max_length=128 # Límite para ahorrar CPU
         ).to(device)
         
         # 3. Inferencia
@@ -102,7 +94,7 @@ def predict():
         pred_idx = torch.argmax(probs, dim=1).item()
         confidence = probs[0][pred_idx].item()
         
-        # Mapear índice a etiqueta (usando tu config.json ya corregido)
+        # Mapear índice a etiqueta (usando la config descargada de HF)
         predicted_label = model.config.id2label[pred_idx]
         
         # Cálculo de latencia
@@ -127,5 +119,4 @@ def predict():
         return jsonify({'error': 'Error interno procesando la solicitud'}), 500
 
 if __name__ == '__main__':
-    # Ejecución local
     app.run(host='0.0.0.0', port=5000)
