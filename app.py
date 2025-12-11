@@ -23,6 +23,20 @@ device = torch.device("cpu") # Railway usa CPU por defecto
 
 logger.info(json.dumps({"event": "startup", "message": f"Cargando modelo desde {MODEL_PATH}..."}))
 
+# --- VALIDACIÓN DE ARCHIVO LFS ---
+archivo_modelo = os.path.join(MODEL_PATH, "model.safetensors")
+if os.path.exists(archivo_modelo):
+    peso = os.path.getsize(archivo_modelo)
+    logger.info(json.dumps({"event": "file_check", "file": "model.safetensors", "size_bytes": peso}))
+    
+    if peso < 10000: # Si pesa menos de 10KB, es un puntero LFS roto
+        msg = f"ERROR CRÍTICO: El archivo del modelo pesa solo {peso} bytes. Es un puntero LFS, no el binario real."
+        logger.error(json.dumps({"event": "lfs_error", "message": msg}))
+        # No hacemos raise inmediato para permitir ver el log, pero fallará abajo.
+else:
+    logger.error(json.dumps({"event": "file_check", "error": "Archivo no encontrado"}))
+# ---------------------------------
+
 try:
     # 1. Cargar Tokenizer y Modelo
     tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
